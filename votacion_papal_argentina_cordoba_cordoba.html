@@ -138,6 +138,20 @@
       margin-top: 20px;
     }
 
+    .comprobante {
+  background-color: #ffffff;
+  padding: 20px;
+  margin-top: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  display: none; /* Se muestra después de emitir el voto */
+  <div class="comprobante" id="comprobante">
+</div>
+
+}
+
+
     #boton-voto {
       background-color: #800000;
       color: white;
@@ -303,30 +317,56 @@
     </div>
   </div>
 
-  <script>
+  <div class="comprobante" id="comprobante-voto">
+    <h2>Comprobante de Voto</h2>
+    <p><strong>DNI:</strong> <span id="comprobante-dni"></span></p>
+    <p><strong>Candidato Elegido:</strong> <span id="comprobante-candidato"></span></p>
+    <p><strong>Fecha de Voto:</strong> <span id="comprobante-fecha"></span></p>
+    <button class="boton" onclick="descargarComprobante()">Descargar Comprobante</button>
+    <p style="margin-top: 20px; color: #800000; font-style: italic;">
+      *Esta página es una broma. Jajajaaaaa 😂😂😘😘 Ningún voto aquí tiene validez real y no está afiliada al Vaticano.
+    </p>
+  </div>
+  
+</div>
+</div>
+
+<script>
     function emitirVoto() {
-      const dni = document.getElementById('dni').value;
-      if (dni.trim() === "") {
-        alert("Por favor, ingrese su DNI antes de votar.");
-      } else {
-        document.getElementById("mensaje").style.display = 'block';
+      const dni = document.getElementById('dni').value.trim();
+      const selector = document.getElementById('candidatos-selector');
+      const candidatoSeleccionado = selector.options[selector.selectedIndex].text;
+      const fecha = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      if (dni === '') {
+        alert('Por favor, ingrese su DNI.');
+        return;
       }
-    }
-    function emitirVoto() {
-      document.getElementById("mensaje").style.display = 'block';
+
+      document.getElementById('comprobante-dni').textContent = dni;
+      document.getElementById('comprobante-candidato').textContent = candidatoSeleccionado;
+      document.getElementById('comprobante-fecha').textContent = fecha;
+
+      document.getElementById('comprobante-voto').style.display = 'block';
     }
 
-    // Mostrar la información del candidato seleccionado automáticamente
-    document.getElementById('candidatos-selector').addEventListener('change', function() {
-      const candidato = this.value;
-      const listaCandidatos = document.querySelectorAll('.candidato');
-      listaCandidatos.forEach(item => {
-        item.style.display = item.id === 'candidato-' + candidato ? 'flex' : 'none';
-      });
-    });
+    function descargarComprobante() {
+      const dni = document.getElementById('comprobante-dni').textContent;
+      const candidato = document.getElementById('comprobante-candidato').textContent;
+      const fecha = document.getElementById('comprobante-fecha').textContent;
 
-    // Mostrar el primer candidato por defecto
-    document.getElementById('candidatos-selector').dispatchEvent(new Event('change'));
+      const contenido = `Comprobante de Voto\n\nDNI: ${dni}\nCandidato: ${candidato}\nFecha: ${fecha}`;
+      const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `comprobante_voto_${dni}.txt`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
   </script>
 </body>
 </html>
